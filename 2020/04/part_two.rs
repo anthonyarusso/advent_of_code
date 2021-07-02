@@ -10,11 +10,6 @@ fn is_valid_height(input: &str) -> bool {
     unit = unit.chars().rev().collect();
     let unit = unit.as_str();
 
-    // looping twice is no longer necessary as we
-    // now consider unitless heights invalid
-    //
-    // run this twice in case height is parsed
-    // incorrectly the first time
    if unit == "cm" {
      let height: u32 = height.parse()
          .expect("Unable to parse height!");
@@ -25,22 +20,7 @@ fn is_valid_height(input: &str) -> bool {
          .expect("Unable to parse height!");
 
      return height >= 59 && height <= 76;
-   } else if unit.parse::<u32>().is_ok() {
-       // the below code works, but misunderstood the
-       // prompt. if no units are given the passport is
-       // invalid.
-
-       /*
-       // no units (e.g. 'cm' / 'in') in input
-       // this means we grabbed the last two
-       // digits, replace them and assume
-       // centimeters.
-       height.push_str(unit);
-       unit = "cm";
-       */
     } else {
-       // Last two chars are neither digits nor
-       // units. Panic.
        panic!("Invalid units provided for height!");
     }
     false
@@ -76,7 +56,7 @@ fn validate_data(entry: String) -> bool {
    let sundae: Vec<&str> = entry.trim_end().split(&[' ', ':'][..]).skip(1).collect();
    let pairs: Vec<(&str, &str)> = sundae.chunks(2).map(|c| (c[0], c[1])).collect();
    // index aligns to field in the match statement below. E.g. fields_present[0]
-   // coincides with 'byr' which is the first entry below.
+   // coincides with 'byr' which is the first entry below, fields_present[1] -> 'iyr', etc.
    let mut fields_present = [false; 7];
 
    for pair in pairs.iter() {
