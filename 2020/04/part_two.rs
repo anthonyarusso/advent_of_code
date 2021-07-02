@@ -2,41 +2,46 @@ use std::io::{self, BufReader};
 use std::io::prelude::*;
 use std::fs::File;
 
-const NUM_OF_FIELDS: usize = 8;
-
 fn is_valid_height(input: &str) -> bool {
     let mut height = input.to_string();
     let mut unit: String = String::new();
     unit.push(height.pop().unwrap());
     unit.push(height.pop().unwrap());
     unit = unit.chars().rev().collect();
-    let mut unit = unit.as_str();
+    let unit = unit.as_str();
 
+    // looping twice is no longer necessary as we
+    // now consider unitless heights invalid
+    //
     // run this twice in case height is parsed
     // incorrectly the first time
-    for _ in 0..2 {
-       if unit == "cm" {
-         let height: u32 = height.parse()
-             .expect("Unable to parse height!");
+   if unit == "cm" {
+     let height: u32 = height.parse()
+         .expect("Unable to parse height!");
 
-         return height >= 150 || height <= 193;
-       } else if unit == "in" {
-         let height: u32 = height.parse()
-             .expect("Unable to parse height!");
+     return height >= 150 && height <= 193;
+   } else if unit == "in" {
+     let height: u32 = height.parse()
+         .expect("Unable to parse height!");
 
-         return height >= 59 || height <= 76;
-       } else if unit.parse::<u32>().is_ok() {
-           // no units (e.g. 'cm' / 'in') in input
-           // this means we grabbed the last two
-           // digits, replace them and assume
-           // centimeters.
-           height.push_str(unit);
-           unit = "cm";
-        } else {
-           // Last two chars are neither digits nor
-           // units. Panic.
-           panic!("Invalid units provided for height!");
-        }
+     return height >= 59 && height <= 76;
+   } else if unit.parse::<u32>().is_ok() {
+       // the below code works, but misunderstood the
+       // prompt. if no units are given the passport is
+       // invalid.
+
+       /*
+       // no units (e.g. 'cm' / 'in') in input
+       // this means we grabbed the last two
+       // digits, replace them and assume
+       // centimeters.
+       height.push_str(unit);
+       unit = "cm";
+       */
+    } else {
+       // Last two chars are neither digits nor
+       // units. Panic.
+       panic!("Invalid units provided for height!");
     }
     false
 }
@@ -74,13 +79,13 @@ fn validate_data(entry: String) -> bool {
    // coincides with 'byr' which is the first entry below.
    let mut fields_present = [false; 7];
 
-   for (i, pair) in pairs.iter().enumerate() {
+   for pair in pairs.iter() {
        match pair.0 {
            "byr" => {
                let birth_year: u32 =
                    pair.1.parse()
                    .expect("Unable to parse birth year!");
-               if pair.1.len() == 4 && (birth_year < 1920 || birth_year > 2002) {
+               if birth_year < 1920 || birth_year > 2002 || pair.1.len() != 4 {
                    return false;
                }
                if fields_present[0] {
@@ -95,7 +100,7 @@ fn validate_data(entry: String) -> bool {
                let issue_year: u32 =
                    pair.1.parse()
                    .expect("Unable to parse issue year!");
-               if pair.1.len() == 4 && (issue_year < 2010 || issue_year > 2020) {
+               if issue_year < 2010 || issue_year > 2020 || pair.1.len() != 4 {
                    return false;
                }
                if fields_present[1] {
@@ -108,7 +113,7 @@ fn validate_data(entry: String) -> bool {
                let expire_year: u32 =
                    pair.1.parse()
                    .expect("Unable to parse expiration year!");
-               if pair.1.len() == 4 && (expire_year < 2020 || expire_year > 2030) {
+               if expire_year < 2020 || expire_year > 2030 || pair.1.len() != 4 {
                    return false;
                }
                if fields_present[2] {
