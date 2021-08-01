@@ -77,10 +77,11 @@ fn main() -> io::Result<()> {
     } // END `for line`
 
     // Check every empty seat to see if its neighbors are taken
-    for (i, is_taken) in taken_seats.iter().enumerate() {
+    // (.skip(1) to avoid subtraction overflows on 0 - 1 since we
+    // know the first seat doesn't exist anyways.
+    for (i, is_taken) in taken_seats.iter().enumerate().skip(1) {
         if !is_taken {
-            println!("seat {} is not taken!", i);
-            if i != 0 && taken_seats[i - 1] && taken_seats[i + 1] {
+            if taken_seats[i - 1] && taken_seats[i + 1] {
                 your_seat_id = i;
             }
         }
