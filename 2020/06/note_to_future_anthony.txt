@@ -1,0 +1,21 @@
+When working on day 6 part two you used
+
+if current_group.is_empty()
+
+to determine if you were working on the first line of
+a new group. This was flawed because you removed char
+elements from the current_group vector if they were
+not shared by all members of the group. I.e. if the
+first person answered yes to 'a' and the second yes to
+only 'b' then current_group would already be emptied
+since there is no answer all the members of the group
+shared.
+
+This is an issue because there could still be more
+members of a group, but the current_group vector would
+be emptied sooner than expected. Using 
+
+if current_group.is_empty()
+
+to detect the first line of a new group allowed it to
+be triggered early under the above circumstances.
