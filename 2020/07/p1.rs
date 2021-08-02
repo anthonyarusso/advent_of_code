@@ -3,22 +3,29 @@ use std::io::prelude::*;
 use std::fs::File;
 use std::collections::HashMap;
 
-fn count_parents(child: &str, map: &HashMap<String, String>) -> usize {
+fn count_parents(child: &str, map: &HashMap<String, String>, p_map: &mut HashMap<String, bool>) -> usize {
     let mut parent_count = 0;
-    // Parse the string of parents into a Vector of Strings
-    let parents: Vec<String> = map
-        .get(child)
-        .unwrap()
-        .to_string()
-        .split(';')
-        .map(|e| e.to_string())
-        .collect();
+    // Create a separate (permanent) variable to store the parent string
+    // that parents' slices will borrow from.
 
-    parent_count += parents.len();
+    // Child is NOT an outermost bag, i.e. has parent bags
+    if let Some(p) = map.get(child) {
+        let parent_string: String = p.to_string();
+        // Parse the string of parents into a Vector of Strings
+        let parents: Vec<&str> = parent_string
+            .split(';')
+            .collect();
 
-    for parent in parents.iter() {
-        parent_count += count_parents(parent, map);
+        for parent in parents.iter() {
+            // If this is the first time this particular parent
+            // has been accounted for, then increment.
+            if p_map.insert(parent.to_string(), true).is_none() {
+                parent_count += 1;
+                parent_count += count_parents(parent, map, p_map);
+            }
+        }
     }
+
     parent_count
 }
 
@@ -28,6 +35,8 @@ fn main() -> io::Result<()> {
 
     // <Key, Value> : <Bag Color, List of 'Parent' Bag Colors>
     let mut bags_map: HashMap<String, String> = HashMap::new();
+    // <Key, Value> : <Bag Color, has_been_accounted>
+    let mut accounted_parents: HashMap<String, bool> = HashMap::new();
 
     for line in f.lines() {
        let line = line
@@ -37,8 +46,6 @@ fn main() -> io::Result<()> {
            .replace(" bag", "")
            .replace(char::is_numeric, "")
            .replace("  ", " ");
-
-       // let mut children: Vec<String> = Vec::new();
 
        let sundae = line.split_once("contain");
        let parent = sundae.unwrap().0.trim_end();
@@ -60,9 +67,12 @@ fn main() -> io::Result<()> {
            }
        }
     }
-
     // bags_map now contains a list of every parent per child key
     // in the form: "child", "parent1;parent2;parent3"
+    
+    accounted_parents.reserve(bags_map.len());
+    println!("shiny gold bags can be found in {} different colored bags",
+             count_parents("shiny gold", &bags_map, &mut accounted_parents));
 
     Ok(())
 }
