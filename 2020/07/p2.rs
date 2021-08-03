@@ -29,7 +29,7 @@ fn main() -> io::Result<()> {
     let f = BufReader::new(f);
 
     // <Key, Value> : <Bag Color, List of Contents>
-    let mut bags_map: HashMap<&str, Bag> = HashMap::new();
+    let mut bags_map: HashMap<String, Bag> = HashMap::new();
 
     for line in f.lines() {
         // line creates a String containing the bag names
@@ -47,14 +47,15 @@ fn main() -> io::Result<()> {
         let parent = sundae.0.trim_end_matches(" bags").trim_end_matches(" bag");
 
         // Parse the 'child' bags' color names.
-        let children: Vec<&str> = sundae.1
+        let children: Vec<String> = sundae.1
             .trim_end_matches('.')
             .split(", ")
             .map(|s| s
                  .trim_start_matches(char::is_numeric)
                  .trim_start()
                  .trim_end_matches(" bags")
-                 .trim_end_matches(" bag"))
+                 .trim_end_matches(" bag")
+                 .to_string())
             .collect();
 
         // Split the 'children string' along spaces, then only
@@ -78,12 +79,17 @@ fn main() -> io::Result<()> {
         // from these Strings with proper lifetimes (compared to
         // `line`'s relatively short lifetime in this for loop.
         for child in children.iter() {
-            bags_map.insert(&child.to_string(), Bag::new(child));
+            bags_map.insert(child.to_string(), Bag::new(child));
         }
         let mut parent_bag = Bag::new(parent);
+
         for (i, child) in children.iter().enumerate() {
             if bags_map.get(child).is_none() {
                 panic!("Hashmap does not contain key {}!", child);
+            }
+            // Bag contains no other bags. Skip inserting children.
+            if child.contains("no other") {
+                break;
             }
             if amounts.get(i).is_none() {
                 panic!("Bag color - Bag Amount mismatch!");
