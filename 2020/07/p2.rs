@@ -42,7 +42,11 @@ fn main() -> io::Result<()> {
             panic!("Error: Cannot locate substring!");
         }
         let sundae = line.split_once(" contain ").unwrap();
-        let parent = sundae.0.trim_end_matches("bags").trim_end_matches("bag");
+
+        // Parse the 'parent' bag's color name.
+        let parent = sundae.0.trim_end_matches(" bags").trim_end_matches(" bag");
+
+        // Parse the 'child' bags' color names.
         let children: Vec<&str> = sundae.1
             .trim_end_matches('.')
             .split(", ")
@@ -53,13 +57,39 @@ fn main() -> io::Result<()> {
                  .trim_end_matches(" bag"))
             .collect();
 
+        // Split the 'children string' along spaces, then only
+        // keep substrings that are entirely numerics.
+        let mut amounts: Vec<&str> = sundae.1
+            .split(' ')
+            .collect();
+        amounts.retain(|s| s.chars().all(char::is_numeric));
+        let amounts: Vec<u32> = amounts
+            .iter()
+            .map(|s| {
+                if s.parse::<u32>().is_err() {
+                    panic!("Failed to parse numerical string as integer!");
+                }
+                s.parse::<u32>().unwrap()
+            })
+            .collect();
 
-        print!("{} --- ", parent);
+        // Insert 'child' bags with only their color name in an
+        // owned String. This allows the 'parent' bag to borrow
+        // from these Strings with proper lifetimes (compared to
+        // `line`'s relatively short lifetime in this for loop.
         for child in children.iter() {
-            print!("{};", child);
+            bags_map.insert(&child.to_string(), Bag::new(child));
         }
-        print!("\n");
-
+        let mut parent_bag = Bag::new(parent);
+        for (i, child) in children.iter().enumerate() {
+            if bags_map.get(child).is_none() {
+                panic!("Hashmap does not contain key {}!", child);
+            }
+            if amounts.get(i).is_none() {
+                panic!("Bag color - Bag Amount mismatch!");
+            }
+            parent_bag.push(&bags_map.get(child).unwrap().color, *amounts.get(i).unwrap());
+        }
         // map inserts using a reference to the String as a key
         // if the bag doesnt exist in the map then the color field
         // of the Bag struct permanently stores the color's name.
