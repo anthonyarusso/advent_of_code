@@ -9,8 +9,10 @@ if ($extName -eq ".rs") {
 		New-Item -ItemType Directory -Path ".\rrun-bin"
 	}
 	rustc --out-dir="rrun-bin" "$binName.rs"
-	$fullExpression = ".\rrun-bin\$binName $args"
-	Invoke-Expression $fullExpression
+	if ($?) {
+		$fullExpression = ".\rrun-bin\$binName $args"
+		Invoke-Expression $fullExpression
+  }
 } else {
 	Write-Output "Not a Rust source file."
 }
