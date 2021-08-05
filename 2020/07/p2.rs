@@ -1,7 +1,7 @@
 use std::io::{self, BufReader};
 use std::io::prelude::*;
 use std::fs::File;
-use std::collections::HashMap;
+use std::collections::{HashMap, HashSet};
 
 const CHOSEN_BAG: &'static str = "shiny gold";
 type IndexSlice = (usize, usize);
@@ -24,15 +24,22 @@ fn get_color_from_store(color: &str, store: &str) -> IndexSlice {
     (start, end)
 }
 
-fn count_unique_ancestors(color: IndexSlice, map: &HashMap<IndexSlice, Bag>) -> u32 {
+fn count_unique_ancestors(
+    color: IndexSlice,
+    map: &HashMap<IndexSlice, Bag>,
+    tracker: &mut HashSet<IndexSlice>,
+    ) -> u32 {
     // Fix this function. Currently is counts all parents of all ancestors,
     // but does not check if any given ancestor is actually unique.
     // Use something like a HashSet to resolve this.
     let mut total = 0;
     let child = map.get(&color).expect("Unable to locate key in map!");
     for parent in child.holders.iter() {
-        total += 1;
-        total += count_unique_ancestors(*parent, map);
+
+        if tracker.insert(*parent) {
+            total += 1;
+        }
+            total += count_unique_ancestors(*parent, map, tracker);
     }
     total
 }
@@ -148,10 +155,12 @@ fn main() -> io::Result<()> {
 
     } // end 'for line in lines'
 
+    let mut tracker: HashSet<IndexSlice> = HashSet::new();
+
     let bag_of_interest = get_color_from_store(CHOSEN_BAG, &store);
     println!("{} has {} unique ancestors.",
              CHOSEN_BAG,
-             count_unique_ancestors(bag_of_interest, &map));
+             count_unique_ancestors(bag_of_interest, &map, &mut tracker));
 
     println!("Each {} bag contains {} other bags in total.",
              CHOSEN_BAG,
