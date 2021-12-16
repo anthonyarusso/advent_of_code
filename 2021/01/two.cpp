@@ -12,7 +12,7 @@ int main() {
 	// For the first four entries the oldest
 	// member will be index 0 until an
 	// overwrite occurs.
-	//
+	
 	// Afterwards the oldest member will shift
 	// and always be the next member following
 	// the overwritten index.
@@ -25,20 +25,24 @@ int main() {
 
 	if (file.is_open()) {
 		getline(file, line);
-		window[nums % 4] = stoi(line);
+		window[nums] = stoi(line);
 		nums += 1;
 
 		while (getline(file, line)) {
 			window[nums % 4] = stoi(line);
 			nums += 1;
-			
+	
 			// Only once our windows are filled.
 			if (nums >= 4) {
 				// Index of the oldest member.
-				int oldest = (nums + 1) % 4;
-				int sum1 = window[oldest] + window[oldest + 1] + window[oldest + 2];
-				int sum2 = window[oldest + 1] + window[oldest + 2] + window[oldest + 3];
-				if (sum2 > sum1) {
+				int oldest = nums % 4;
+				// Instead of checking the sums just compare
+				// the numbers which are exclusive to the
+				// first and second window (oldest and newest
+				// indices).
+				int one = window[oldest];
+				int two = window[(oldest + 3) % 4];
+				if (two > one) {
 					count += 1;
 				}
 			}
