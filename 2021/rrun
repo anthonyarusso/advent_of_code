@@ -1,0 +1,12 @@
+#!/bin/bash
+binName=$1
+extName="${binName:(-3)}"
+if [ $extName == ".rs" ]
+then
+    binName="${binName::(-3)}"
+    [[ -d rrun-bin ]] || mkdir rrun-bin
+    rustc --out-dir="rrun-bin" $binName.rs
+    ./rrun-bin/$binName ${@:2}
+else
+    echo "Not a Rust source file."
+fi
