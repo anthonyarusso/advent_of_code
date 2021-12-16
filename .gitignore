@@ -1,3 +1,5 @@
 /meta
 /rrun-bin
 **/rrun-bin
+*.out
+*.exe
