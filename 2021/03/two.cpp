@@ -33,83 +33,98 @@ int main() {
 		// out of the REMAINING numbers.
 		unsigned int bit_mask = pow(2, length - 1);
 		bitset<sizeof(unsigned int) * 8> bs(bit_mask);
-		cout << "bit_mask: " << bs << endl;
+		// cout << "bit_mask: " << bs << endl;
 
 		oxys = nums;
 		co2s = nums;
 		int ones = 0;
 
 		while (bit_mask > 0) {
-			cout << "oxys.size(): " << oxys.size() << endl;
-			cout << "co2s.size(): " << co2s.size() << endl;
 			// Determine the most common bit value at this
 			// position for the remaining oxys.
 			ones = 0;
-			for (auto n : oxys) {
-				// If the bit in the current position is `1`.
-				if ((bit_mask & n) == bit_mask) {
-					ones += 1;
+			// DEBUG PRINT
+			if (oxys.size() == 5) {
+				cout << "oxys == 5: \n";
+				for (auto n : oxys) {
+					bitset<sizeof(unsigned int) * 8> b(n);
+					cout << left << setw(8) << n << ": "
+						<< setw(34) << b << endl;
 				}
+				
+				bitset<sizeof(unsigned int) * 8> bs(bit_mask);
+				cout << "bit_mask: " << bs << endl;
 			}
-			
-			// If greater than or equal to half. Default to 1 if half.
-			if (ones >= line_count / 2) {
-				bit_value = 1;
-			} else {
-				bit_value = 0;
-			}
-
-			auto oxy_iter = oxys.begin();
-			while (oxy_iter != oxys.end()) {
-				// If current value in oxys does NOT contain the
-				// most common bit value at the specified position,
-				// remove it.
-				if ((*oxy_iter & bit_mask) != bit_value) {
-					oxy_iter = oxys.erase(oxy_iter);
+			if (oxys.size() > 1) {
+				for (auto n : oxys) {
+					// If the bit in the current position is `1`.
+					if ((bit_mask & n) == bit_mask) {
+						ones += 1;
+					}
+				}
+				
+				// If greater than or equal to half. Default to 1 if half.
+				cout << "oxy ones: " << ones << endl;
+				if (ones >= oxys.size() / 2) {
+					bit_value = 1;
 				} else {
-					// Otherwise, retain this value by incrementing
-					// the iterator to continue.
-					oxy_iter += 1;
+					bit_value = 0;
+				}
+
+				cout << "oxys.size(): " << oxys.size()
+					<< " bit_value: " << bit_value << endl;
+
+				auto oxy_iter = oxys.begin();
+				while (oxy_iter != oxys.end()) {
+					// If current value in oxys does NOT contain the
+					// most common bit value at the specified position,
+					// remove it.
+					if ((*oxy_iter & bit_mask) != bit_value) {
+						oxy_iter = oxys.erase(oxy_iter);
+					} else {
+						// Otherwise, retain this value by incrementing
+						// the iterator to continue.
+						oxy_iter += 1;
+					}
 				}
 			}
 
 			// Determine the most common bit value at this
-			// position for the remaining oxys.
-
+			// position for the remaining co2s.
 			ones = 0;
-			for (auto n : co2s) {
-				// If the bit in the current position is `1`.
-				if ((bit_mask & n) == bit_mask) {
-					ones += 1;
+			if (co2s.size() > 1) {
+				for (auto n : co2s) {
+					// If the bit in the current position is `1`.
+					if ((bit_mask & n) == bit_mask) {
+						ones += 1;
+					}
 				}
-			}
-			
-			// Only if greater than half. Default to 0 if half.
-			if (ones > line_count / 2) {
-				bit_value = 1;
-			} else {
-				bit_value = 0;
-			}
-
-			auto co2_iter = co2s.begin();
-			while (co2_iter != co2s.end()) {
-				// If current value in co2s DOES contain the
-				// most common bit value at the specified position,
-				// remove it.
-				if ((*co2_iter & bit_mask) == bit_value) {
-					co2_iter = co2s.erase(co2_iter);
+				
+				// Only if greater than half. Default to 0 if half.
+				if (ones > co2s.size() / 2) {
+					bit_value = 1;
 				} else {
-					// Otherwise, retain this value by incrementing
-					// the iterator to continue.
-					co2_iter += 1;
+					bit_value = 0;
+				}
+
+				auto co2_iter = co2s.begin();
+				while (co2_iter != co2s.end()) {
+					// If current value in co2s DOES contain the
+					// most common bit value at the specified position,
+					// remove it.
+					if ((*co2_iter & bit_mask) == bit_value) {
+						co2_iter = co2s.erase(co2_iter);
+					} else {
+						// Otherwise, retain this value by incrementing
+						// the iterator to continue.
+						co2_iter += 1;
+					}
 				}
 			}
 
 			// Shift our bit_mask right one.
 			bit_mask >>= 1;
 		}
-		cout << "oxys.size(): " << oxys.size() << endl;
-		cout << "co2s.size(): " << co2s.size() << endl;
 	} else {
 		cout << "Unable to open file." << endl;
 	}
