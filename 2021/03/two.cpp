@@ -39,16 +39,15 @@ int main() {
 		co2s = nums;
 		int ones = 0;
 
-		cout << "oxys.size(): " << oxys.size() << endl;
-		while (bit_mask != 0) {
-			bitset<sizeof(unsigned int) * 8> bs(bit_mask);
-			cout << "bit_mask: " << bs << endl;
+		while (bit_mask > 0) {
+			cout << "oxys.size(): " << oxys.size() << endl;
+			cout << "co2s.size(): " << co2s.size() << endl;
 			// Determine the most common bit value at this
 			// position for the remaining oxys.
 			ones = 0;
 			for (auto n : oxys) {
 				// If the bit in the current position is `1`.
-				if (bit_mask & n == bit_mask) {
+				if ((bit_mask & n) == bit_mask) {
 					ones += 1;
 				}
 			}
@@ -65,7 +64,7 @@ int main() {
 				// If current value in oxys does NOT contain the
 				// most common bit value at the specified position,
 				// remove it.
-				if (*oxy_iter & bit_mask != bit_value) {
+				if ((*oxy_iter & bit_mask) != bit_value) {
 					oxy_iter = oxys.erase(oxy_iter);
 				} else {
 					// Otherwise, retain this value by incrementing
@@ -80,7 +79,7 @@ int main() {
 			ones = 0;
 			for (auto n : co2s) {
 				// If the bit in the current position is `1`.
-				if (bit_mask & n == bit_mask) {
+				if ((bit_mask & n) == bit_mask) {
 					ones += 1;
 				}
 			}
@@ -97,7 +96,7 @@ int main() {
 				// If current value in co2s DOES contain the
 				// most common bit value at the specified position,
 				// remove it.
-				if (*co2_iter & bit_mask == bit_value) {
+				if ((*co2_iter & bit_mask) == bit_value) {
 					co2_iter = co2s.erase(co2_iter);
 				} else {
 					// Otherwise, retain this value by incrementing
