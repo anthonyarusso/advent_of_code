@@ -86,6 +86,7 @@ int main() {
 				<< " oxys[0]: " << oxys[0] << endl;
 			cout << "co2s.size(): " << co2s.size()
 				<< " co2s[0]: " << co2s[0] << endl;
+			cout << "Product = " << oxys[0] * co2s[0] << endl;
 	} else {
 		cout << "Failed to open file." << endl;
 	}
