@@ -4,9 +4,14 @@ using namespace std;
 
 unsigned int to_decimal(string& bits);
 
+/* The `bit_value` approach was incorrect as the
+ * bit mask produced powers of 2, not necessarily
+ * 1 or 0.
+ */
+
 int main() {
 	int line_count = 0;
-	unsigned int bit_value;
+	bool bit_value = false;
 	vector<unsigned int> nums, oxys, co2s;
 	string line;
 	ifstream file;
@@ -43,18 +48,6 @@ int main() {
 			// Determine the most common bit value at this
 			// position for the remaining oxys.
 			ones = 0;
-			// DEBUG PRINT
-			if (oxys.size() == 5) {
-				cout << "oxys == 5: \n";
-				for (auto n : oxys) {
-					bitset<sizeof(unsigned int) * 8> b(n);
-					cout << left << setw(8) << n << ": "
-						<< setw(34) << b << endl;
-				}
-				
-				bitset<sizeof(unsigned int) * 8> bs(bit_mask);
-				cout << "bit_mask: " << bs << endl;
-			}
 			if (oxys.size() > 1) {
 				for (auto n : oxys) {
 					// If the bit in the current position is `1`.
@@ -63,22 +56,21 @@ int main() {
 					}
 				}
 				
-				// If greater than or equal to half. Default to 1 if half.
 				cout << "oxy ones: " << ones << endl;
 				if (ones >= oxys.size() / 2) {
-					bit_value = 1;
+					// Default to 1 for oxys.
+					bit_value = true;
 				} else {
-					bit_value = 0;
+					bit_value = false;
 				}
-
-				cout << "oxys.size(): " << oxys.size()
-					<< " bit_value: " << bit_value << endl;
 
 				auto oxy_iter = oxys.begin();
 				while (oxy_iter != oxys.end()) {
 					// If current value in oxys does NOT contain the
 					// most common bit value at the specified position,
 					// remove it.
+					cout << "mask: " << (*oxy_iter & bit_mask);
+					cout << " bool: " << ((*oxy_iter & bit_mask) != bit_value) << endl;
 					if ((*oxy_iter & bit_mask) != bit_value) {
 						oxy_iter = oxys.erase(oxy_iter);
 					} else {
@@ -88,6 +80,10 @@ int main() {
 					}
 				}
 			}
+			cout << "oxys.size(): " << oxys.size()
+				<< " bit_value: " << bit_value
+				<< " ones: " << ones << endl;
+
 
 			// Determine the most common bit value at this
 			// position for the remaining co2s.
@@ -100,11 +96,11 @@ int main() {
 					}
 				}
 				
-				// Only if greater than half. Default to 0 if half.
 				if (ones > co2s.size() / 2) {
-					bit_value = 1;
+					// Default to 0 for co2s.
+					bit_value = true;
 				} else {
-					bit_value = 0;
+					bit_value = false;
 				}
 
 				auto co2_iter = co2s.begin();
