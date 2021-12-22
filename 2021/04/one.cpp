@@ -1,5 +1,7 @@
 #include <bits/stdc++.h>
 
+#define BOARD_SIZE 25;
+
 using namespace std;
 
 int main() {
@@ -39,8 +41,6 @@ int main() {
 				strcpy(num_cstr, line.c_str());
 				token = strtok(num_cstr, " ");
 
-				// Current board is at the end of the boards vector.
-
 				while (token != NULL) {
 					// Current board is at the end of the boards vector.
 					// I.e. boards.at(boards.size() - 1) is the current board.
@@ -50,6 +50,7 @@ int main() {
 				}
 			}
 		}
+		// Boards vector is now filled.
 	} else {
 		cout << "Failed to open file." << endl;
 	}
