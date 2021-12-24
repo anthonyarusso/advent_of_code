@@ -96,12 +96,24 @@ int main() {
 				cout << m << ", ";
 			}
 			cout << endl;
+			int last_draw = boards[winning_index][*(marks[winning_index].end() - 1)];
 			cout << "Winner's last draw: winner[" << *(marks[winning_index].end() - 1)
 				<< "] = "
-				<< boards[winning_index][*(marks[winning_index].end() - 1)]
+				<< last_draw
 				<< "\ndraws[" << draws_count[winning_index]
 				<< " - 1] == " << draws[draws_count[winning_index] - 1]
 				<< endl;
+			// Sum all the unmarked numbers from the winning board.
+			// To do this, set all mark numbers to 0 and sum all numbers.
+			for (auto m : marks[winning_index]) {
+				boards[winning_index][m] = 0;	
+			}
+			int sum = 0;
+			for (int i = 0; i < BOARD_SIZE; i++) {
+				sum += boards[winning_index][i];
+			}
+			cout << "Sum: " << sum << " Last Draw: " << last_draw
+				<< " Product: " << sum * last_draw << endl;
 		}
 	} else {
 		cout << "Failed to open file." << endl;
