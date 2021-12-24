@@ -1,10 +1,11 @@
 #include <bits/stdc++.h>
 
 #define BOARD_SIZE 25
+#define MAX_BOARD_CHARS 30
 
 using namespace std;
 
-int draws_to_win(
+int draws_to_win (
 	   vector<int>& draws,
 	   vector<int>& marks,
 	   int* board,
@@ -20,6 +21,7 @@ int main() {
 	file.open("input.txt");
 
 	if (file.is_open()) {
+		// Read the drawn numbers from file.
 		getline(file, line);
 		char* token;
 		// Convert line to char* for use in strtok.
@@ -33,15 +35,14 @@ int main() {
 			token = strtok(NULL, ",");
 		}
 
-		char num_cstr[30];
+		// Read boards from file.
+		char num_cstr[MAX_BOARD_CHARS];
 		int board_index = 0;
-		// Push a pointer to an empty int array to the boards vector.
-		boards.push_back(new int[BOARD_SIZE]);
-
+	
 		// Fill the boards vector.
 		while (getline(file, line)) {
 			if (line == "") {
-				// Start a new board with an empty array.
+				// Start a new board with a pointer to an empty array.
 				boards.push_back(new int[BOARD_SIZE]);
 				board_index = 0;
 			} else {
@@ -59,10 +60,14 @@ int main() {
 			}
 		}
 		// Boards vector is now filled.
-		vector<int> marks[boards.size()];
+		vector<vector<int>> marks;
 		vector<int> draws_count;
 		int d;
 		for (int i = 0; i < boards.size(); i++) {
+			vector<int> ms;
+			// Push an empty vector to marks to be filled
+			// by the draws_to_win function.
+			marks.push_back(ms);
 			draws_count.push_back(
 					draws_to_win(
 						draws,
@@ -72,23 +77,15 @@ int main() {
 						5)
 					);
 		}
-		/*
-		for (auto board : boards) {
-			draws_count.push_back(draws_to_win(draws, board, 5, 5));
-		}
-		*/
 		int index = 0, winning_index = -1;
-		cout << "draws_count: ";
+		int tracker = INT_MAX;
 		for (auto c : draws_count) {
-			cout << c << ", ";
-			if (c != -1) {
+			if (c < tracker) {
+				tracker = c;
 				winning_index = index;
-				break;
 			}
 			index += 1;
 		}
-		cout << endl;
-		cout << "winning_index: " << winning_index << endl;
 		if (winning_index == -1) {
 			cout << "No winner found!" << endl;
 		} else {
@@ -99,8 +96,13 @@ int main() {
 				cout << m << ", ";
 			}
 			cout << endl;
+			cout << "Winner's last draw: winner[" << *(marks[winning_index].end() - 1)
+				<< "] = "
+				<< boards[winning_index][*(marks[winning_index].end() - 1)]
+				<< "\ndraws[" << draws_count[winning_index]
+				<< " - 1] == " << draws[draws_count[winning_index] - 1]
+				<< endl;
 		}
-
 	} else {
 		cout << "Failed to open file." << endl;
 	}
@@ -123,6 +125,7 @@ int draws_to_win(
 	for (int i = 0; i < draws.size(); i++) {
 		for (int j = 0; j < board_size; j++) {
 			if (draws[i] == board[j]) {
+				// cout << "i: " << i << ", j: " << j << ", val: " << draws[i] << endl;
 				// Increment our counters for rows and columns.
 				rows[j / row_size] += 1;
 				columns[j % row_size] += 1;
